@@ -33,16 +33,16 @@ info:
   description: API service for AIRR Knowledge.
 
 servers:
-  - url: https://airr-knowledge.org/api/v1
+  - url: https://airr-knowledge.org/akc/v1
     description: Production server
     variables:
       basePath:
-        default: /api/v1
-  - url: https://ak-staging.airr-knowledge.org/api/v1
+        default: /akc/v1
+  - url: https://ak-staging.airr-knowledge.org/akc/v1
     description: Staging server
     variables:
       basePath:
-        default: /api/v1
+        default: /akc/v1
 
 # TODO: this needs to point to the LinkML schema for the API
 components:
