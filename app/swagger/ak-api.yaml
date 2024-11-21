@@ -1,0 +1,131 @@
+#
+# AIRR Knowledge Web API specification
+#
+# AIRR Knowledge Web API
+# https://airr-knowledge.org
+#
+# Copyright (C) 2024 The University of Texas Southwestern Medical Center
+#
+# Author: Scott Christley <scott.christley@utsouthwestern.edu>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published
+# by the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+
+openapi: '3.0'
+info:
+  title: AIRR Knowledge API
+  version: '1.0.0'
+  contact:
+    name: AIRR Knowledge
+    url: 'https://airr-knowledge.org/'
+    email: airr-knowledge@utsouthwestern.edu
+  description: API service for AIRR Knowledge.
+
+servers:
+  - url: https://airr-knowledge.org/api/v1
+    description: Production server
+    variables:
+      basePath:
+        default: /api/v1
+  - url: https://ak-staging.airr-knowledge.org/api/v1
+    description: Staging server
+    variables:
+      basePath:
+        default: /api/v1
+
+# TODO: this needs to point to the LinkML schema for the API
+components:
+  schemas:
+
+    # Info object
+    info_object:
+      type: object
+      description: Provides information about the API service
+      properties:
+        title:
+          type: string
+        version:
+          type: string
+        description:
+          type: string
+        contact: 
+          type: object
+          properties:
+            name:
+              type: string
+            url:
+              type: string
+            email:
+              type: string
+        license:
+          type: object
+          properties:
+            name:
+              type: string
+            url:
+              type: string
+
+    # error response
+    error_response:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Detail about the error
+
+paths:
+  /:
+    get:
+      description: |
+        Service heartbeat.
+      operationId: get_service_status
+      responses:
+        '200':
+          description: |
+            Success.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: string
+            text/html:
+              schema:
+                type: string
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+
+  /info:
+    get:
+      description: Service information.
+      operationId: get_service_info
+      responses:
+        '200':
+          description: Success.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/info_object'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+
