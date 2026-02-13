@@ -82,6 +82,10 @@ var ServiceAccount = tapisIO.serviceAccount;
 var GuestAccount = tapisIO.guestAccount;
 var authController = tapisIO.authController;
 var webhookIO = require('vdj-tapis-js/webhookIO');
+var pgSettings = require('vdj-tapis-js/pgSettings');
+pgSettings.set_config(config);
+var pgIO = require('vdj-tapis-js/pgIO');
+
 
 // Controllers
 var apiResponseController = require('./controllers/apiResponseController');
@@ -105,11 +109,15 @@ if (config.hostServiceAccount) {
 } */
 
 
-// Verify we can login to database
+// Verify we can login to Tapis
 var ServiceAccount = tapisIO.serviceAccount;
 ServiceAccount.getToken()
-    .then(function(serviceToken) {
-        config.log.info(context, 'Successfully acquired service token.');
+    .then(function() {
+	config.log.info(context, 'Acquired Tapis service account token', true);
+	return pgIO.testConnection();
+    })
+    .then(function() {
+        config.log.info(context, 'Successfully connected to database.', true);
 
         // wait for the AIRR spec to be dereferenced
         //return airr.load_schema();
@@ -127,6 +135,7 @@ ServiceAccount.getToken()
         return $RefParser.dereference(api_spec);
     })
     .then(function(api_schema) {
+	config.log.info(context, 'Loaded AK WEB API version: ' + api_spec.info.version, true);
         //console.log(JSON.stringify(api_schema,null,2));
 
         // wrap the operations functions to catch syntax errors and such
@@ -169,7 +178,7 @@ ServiceAccount.getToken()
         // Start listening on port
         return new Promise(function(resolve, reject) {
             app.listen(app.get('port'), function() {
-                config.log.info(context, 'AIRR Knowledge API (' + config.info.version + ') service listening on port ' + app.get('port'));
+                config.log.info(context, 'AIRR Knowledge API (' + config.info.version + ') service listening on port ' + app.get('port'), true);
                 resolve();
             });
         });

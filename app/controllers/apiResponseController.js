@@ -45,16 +45,13 @@ var pgIO = require('vdj-tapis-js/pgIO');
 ApiResponseController.getStatus = function(req, res) {
     var context = 'StatusController.getStatus';
 
-    // Verify we can login with guest account
-    GuestAccount.getToken()
-        .then(function(guestToken) {
-            return pgIO.testConnection();
-        })
+    // Verify we can connect to database
+    pgIO.testConnection()
         .then(function(sql) {
             res.json({"result":"success"});
         })
         .catch(function(error) {
-            var msg = config.log.error(context, 'Could not acquire guest token.\n.' + error);
+            var msg = config.log.error(context, 'Could not connect to database.\n.' + error);
             res.status(500).json({"message":"Internal service error."});
             webhookIO.postToSlack(msg);
         });
