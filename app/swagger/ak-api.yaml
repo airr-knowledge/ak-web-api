@@ -22,7 +22,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-openapi: '3.0'
+openapi: '3.0.0'
 info:
   title: AIRR Knowledge API
   version: '1.0.0'
@@ -33,12 +33,12 @@ info:
   description: API service for AIRR Knowledge.
 
 servers:
-  - url: https://airr-knowledge.org/akc/v1
+  - url: https://api.airr-knowledge.org/akc/v1
     description: Production server
     variables:
       basePath:
         default: /akc/v1
-  - url: https://ak-staging.airr-knowledge.org/akc/v1
+  - url: https://staging.airr-knowledge.org/akc/v1
     description: Staging server
     variables:
       basePath:
