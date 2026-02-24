@@ -36,6 +36,7 @@ var path = require('path');
 var fs = require('fs');
 var yaml = require('js-yaml');
 var $RefParser = require("@apidevtools/json-schema-ref-parser");
+const swaggerUi = require('swagger-ui-express');
 
 
 // Express app
@@ -137,6 +138,10 @@ ServiceAccount.getToken()
     .then(function(api_schema) {
 	config.log.info(context, 'Loaded AK WEB API version: ' + api_spec.info.version, true);
         //console.log(JSON.stringify(api_schema,null,2));
+
+        // enable swagger ui
+        config.log.info(context, 'API swagger ui available at /akc/v1/api-ui');
+        app.use('/akc/v1/api-ui', swaggerUi.serve, swaggerUi.setup(api_schema));
 
         // wrap the operations functions to catch syntax errors and such
         // we do not get a good stack trace with the middleware error handler

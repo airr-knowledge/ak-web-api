@@ -34,6 +34,7 @@
     "nodemailer": "",
     "nodemailer-sendmail-transport": "",
     "postgres": "^3.4.5",
+    "swagger-ui-express": "^4.1.6",
     "tar": "^6.1.2",
     "uuid": "^9.0.1",
     "vdj-tapis-js": "file:vdj-tapis-js",
