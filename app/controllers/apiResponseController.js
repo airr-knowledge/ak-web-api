@@ -65,6 +65,17 @@ ApiResponseController.getInfo = function(req, res) {
 
 // not implemented stub
 ApiResponseController.notImplemented = function(req, res) {
-    res.status(500).json({"message":"Not implemented."});
+    ApiResponseController.sendError("Not implemented.", 500, res);
 }
 
+// Sends an error response with a message to the client
+ApiResponseController.sendError = function(errorMessage, errorCode, response) {
+
+    let apiResponse = {};
+    apiResponse['status'] = 'error';
+    apiResponse['message'] = errorMessage;
+
+    if (response) {
+        response.status(errorCode).json(apiResponse);
+    }
+};

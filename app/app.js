@@ -90,6 +90,7 @@ var pgIO = require('vdj-tapis-js/pgIO');
 
 // Controllers
 var apiResponseController = require('./controllers/apiResponseController');
+var queryController = require('./controllers/queryController');
 
 // load API spec
 var api_spec = yaml.safeLoad(fs.readFileSync(path.resolve(__dirname, './swagger/ak-api.yaml'), 'utf8'));
@@ -176,6 +177,7 @@ ServiceAccount.getToken()
             operations: {
                 get_service_status: async function(req, res) { return try_function(req, res, apiResponseController.getStatus); },
                 get_service_info: async function(req, res) { return try_function(req, res, apiResponseController.getInfo); },
+                perform_query: async function(req, res) { return try_function(req, res, queryController.performQuery); },
 
             }
         });
@@ -199,5 +201,31 @@ ServiceAccount.getToken()
         //process.exit(1);
     });
 
-// WebsocketIO
-//require('./utilities/websocketManager');
+
+// TODO: the graceful shutdown doesn't seem to be working, the signal isn't reaching this process
+// we may want to shift from using supervisor to directly running node, and letting docker compose
+// restart the service if necessary.
+
+// Graceful shutdown handler
+const shutdown = () => {
+    console.log('shutdown signal received: closing database connections');
+
+    // 1. stop accepting new requests
+    app.close(async () => {
+        console.log('HTTP server closed');
+        // 2. Close db connections here
+        await pgIO.endPoolConnection();
+
+        process.exit(0);
+    });
+
+    // 3. Force shutdown after 100 seconds if connections are stuck
+    setTimeout(() => {
+        console.error('Could not close connections in time, forcing shutdown');
+        process.exit(1);
+    }, 100000);
+};
+
+// Listen for SIGTERM (Docker/Kubernetes) or SIGINT (Ctrl+C)
+process.on('SIGTERM', shutdown);
+process.on('SIGINT', shutdown);

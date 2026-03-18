@@ -1,0 +1,10 @@
+{
+  "filters": {
+    "op": "=",
+    "content": {
+      "field": "tcr.receptor.trb_chain.junction_aa",
+      "value": "CASSPSRDRGYEQFF"
+    }
+  }
+}
+
