@@ -59,7 +59,7 @@ QueryController.performQuery = async function(req, res) {
 
     // transform the query input into a postgres query
     var results = await pgIO.restrictedQueryOperation(filters['content']['value']);
-    console.log(results);
+    //console.log(results);
 
     // execute the query
 
