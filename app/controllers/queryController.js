@@ -47,18 +47,23 @@ var apiResponseController = require('./apiResponseController');
 QueryController.performQuery = async function(req, res) {
     var context = 'QueryController.performQuery';
 
-    console.log(req.body);
+    //console.log(req.body);
     let filters = req.body['filters'];
 
     // TODO: limited query support at the moment
     if (!filters) return apiResponseController.sendError("Missing filters with query.", 400, res);
     if (filters['op'] != '=') return apiResponseController.sendError("Query not supported.", 400, res);
-    if (!filters['content']) return apiResponseController.sendError("Invalid query.", 400, res);
-    if (filters['content']['field'] != 'tcr.receptor.trb_chain.junction_aa') return apiResponseController.sendError("Query not supported.", 400, res);
+    if (!filters['content']) return apiResponseController.sendError("Invalid query.", 400, res); 
     if (!filters['content']['value']) return apiResponseController.sendError("Invalid query.", 400, res);
 
     // transform the query input into a postgres query
-    var results = await pgIO.restrictedQueryOperation(filters['content']['value']);
+    let results = [];
+    if (filters['content']['field'] == 'tcr.receptor.trb_chain.junction_aa') {
+        results = await pgIO.restrictedQueryOperation(filters['content']['value']);
+    } else if (filters['content']['field'] == 'tcr.receptor.tra_chain.junction_aa') {
+        results = await pgIO.restrictedQueryOperation(null, filters['content']['value']);
+    } else return apiResponseController.sendError("Query not supported.", 400, res);
+
     //console.log(results);
 
     // execute the query
