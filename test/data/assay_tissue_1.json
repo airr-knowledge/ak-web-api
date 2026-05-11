@@ -1,0 +1,9 @@
+{
+  "filters": {
+    "op": "=",
+    "content": {
+      "field": "assay.specimen.tissue",
+      "value": "UBERON:0001043"
+    }
+  }
+}

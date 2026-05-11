@@ -1,0 +1,9 @@
+{
+  "filters": {
+    "op": "=",
+    "content": {
+      "field": "tcr.receptor.trb_chain.v_call",
+      "value": "TRBV6-2*01"
+    }
+  }
+}

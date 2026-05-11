@@ -1,0 +1,9 @@
+{
+  "filters": {
+    "op": "=",
+    "content": {
+      "field": "tcr.receptor.akc_id",
+      "value": "AKC_RECEPTOR:c95450911e50657efa8e07e3975b53d5e76409d619d73ca3a68a6707fc7880f5"
+    }
+  }
+}

@@ -44,32 +44,49 @@ var pgIO = require('vdj-tapis-js/pgIO');
 var apiResponseController = require('./apiResponseController');
 
 // service status
-QueryController.performQuery = async function(req, res) {
+QueryController.performQuery = async function (req, res) {
     var context = 'QueryController.performQuery';
 
-    //console.log(req.body);
+    console.log(req.body);
     let filters = req.body['filters'];
 
     // TODO: limited query support at the moment
     if (!filters) return apiResponseController.sendError("Missing filters with query.", 400, res);
     if (filters['op'] != '=') return apiResponseController.sendError("Query not supported.", 400, res);
-    if (!filters['content']) return apiResponseController.sendError("Invalid query.", 400, res); 
+    if (!filters['content']) return apiResponseController.sendError("Invalid query.", 400, res);
     if (!filters['content']['value']) return apiResponseController.sendError("Invalid query.", 400, res);
 
     // transform the query input into a postgres query
     let results = [];
-    if (filters['content']['field'] == 'tcr.receptor.trb_chain.junction_aa') {
-        results = await pgIO.restrictedQueryOperation(filters['content']['value']);
-    } else if (filters['content']['field'] == 'tcr.receptor.tra_chain.junction_aa') {
-        results = await pgIO.restrictedQueryOperation(null, filters['content']['value']);
-    } else return apiResponseController.sendError("Query not supported.", 400, res);
+    try {
+        var msg = null;
+        var error = { message: '' };
+        results = await pgIO.performQueryOperation(filters, error)
+            .catch(function(e) {
+                msg = config.log.error(context, e);
+                return apiResponseController.sendError(e, 500, res);
+            });
+        if (msg) return;
+
+        if (!results) {
+            let result_message = "Could not construct valid query. Error: " + error['message'];
+            config.log.error(context, result_message);
+            // queryRecord['status'] = 'reject';
+            // queryRecord['message'] = result_message;
+            // tapisIO.recordQuery(queryRecord);
+            return apiResponseController.sendError(result_message, 400, res);
+        }
+    } catch (e) {
+        let result_message = "Could not construct valid query: " + e;
+        config.log.error(context, result_message);
+        // queryRecord['status'] = 'reject';
+        // queryRecord['message'] = result_message;
+        // tapisIO.recordQuery(queryRecord);
+        return apiResponseController.sendError(result_message, 400, res);
+    }
 
     //console.log(results);
 
-    // execute the query
-
-    // transform the results and send back in response
-
-    // Verify we can connect to database
+    // Return the results
     return res.status(200).json(results);
 }

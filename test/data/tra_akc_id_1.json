@@ -1,0 +1,9 @@
+{
+  "filters": {
+    "op": "=",
+    "content": {
+      "field": "tcr.receptor.tra_chain.akc_id",
+      "value": "AKC_HASH:db747ff67609bb2b3b1da45e3119618101901eefa6bc92eb3b74c8dfce923735"
+    }
+  }
+}

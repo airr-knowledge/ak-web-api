@@ -1,0 +1,9 @@
+{
+  "filters": {
+    "op": "=",
+    "content": {
+      "field": "tcr.receptor.tra_chain.junction_aa",
+      "value": "CAGLRDNNAGNMLTF"
+    }
+  }
+}
