@@ -1,0 +1,9 @@
+{
+  "filters": {
+    "op": "=",
+    "content": {
+      "field": "tcr.mhc",
+      "value": "MRO:0001290"
+    }
+  }
+}

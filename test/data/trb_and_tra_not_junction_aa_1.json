@@ -1,0 +1,19 @@
+{
+  "filters": {
+    "op": "and",
+    "content": [
+      {
+        "op": "not",
+        "content": {
+          "field": "tcr.receptor.trb_chain.junction_aa"
+        }
+      },
+      {
+        "op": "not",
+        "content": {
+          "field": "tcr.receptor.tra_chain.junction_aa"
+        }
+      }
+    ]
+  }
+}

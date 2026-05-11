@@ -1,0 +1,8 @@
+{
+  "filters": {
+    "op": "is",
+    "content": {
+      "field": "tcr.epitope.akc_id"
+    }
+  }
+}

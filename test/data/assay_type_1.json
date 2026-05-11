@@ -1,0 +1,9 @@
+{
+  "filters": {
+    "op": "=",
+    "content": {
+      "field": "assay.type",
+      "value": "TCellReceptorEpitopeBindingAssay"
+    }
+  }
+}

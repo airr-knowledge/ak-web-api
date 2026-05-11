@@ -1,0 +1,9 @@
+{
+  "filters": {
+    "op": "=",
+    "content": {
+      "field": "tcr.epitope.sequence_aa",
+      "value": "YVVDDPCPIHFY"
+    }
+  }
+}

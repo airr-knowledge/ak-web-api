@@ -1,0 +1,20 @@
+{
+  "filters": {
+    "op": "and",
+    "content": [
+      {
+        "op": "=",
+        "content": {
+          "field": "tcr.receptor.trb_chain.junction_aa",
+          "value": "CASSQRGGLYEQYF"
+        }
+      },
+      {
+        "op": "is null",
+        "content": {
+          "field": "tcr.epitope.akc_id"
+        }
+      }
+    ]
+  }
+}

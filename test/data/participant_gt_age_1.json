@@ -1,0 +1,9 @@
+{
+  "filters": {
+    "op": ">",
+    "content": {
+      "field": "assay.participant.age",
+      "value": "25"
+    }
+  }
+}

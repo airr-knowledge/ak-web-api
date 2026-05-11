@@ -1,0 +1,21 @@
+{
+  "filters": {
+    "op": "and",
+    "content": [
+      {
+        "op": "=",
+        "content": {
+          "field": "tcr.receptor.trb_chain.junction_aa",
+          "value": "CASSLAGLAGTDTQYF"
+        }
+      },
+      {
+        "op": "=",
+        "content": {
+          "field": "tcr.receptor.tra_chain.junction_aa",
+          "value": "CAVRDNSGTYKYIF"
+        }
+      }
+    ]
+  }
+}

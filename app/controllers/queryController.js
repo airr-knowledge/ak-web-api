@@ -50,12 +50,6 @@ QueryController.performQuery = async function (req, res) {
     console.log(req.body);
     let filters = req.body['filters'];
 
-    // TODO: limited query support at the moment
-    if (!filters) return apiResponseController.sendError("Missing filters with query.", 400, res);
-    if (filters['op'] != '=') return apiResponseController.sendError("Query not supported.", 400, res);
-    if (!filters['content']) return apiResponseController.sendError("Invalid query.", 400, res);
-    if (!filters['content']['value']) return apiResponseController.sendError("Invalid query.", 400, res);
-
     // transform the query input into a postgres query
     let results = [];
     try {
@@ -64,7 +58,7 @@ QueryController.performQuery = async function (req, res) {
         results = await pgIO.performQueryOperation(filters, error)
             .catch(function(e) {
                 msg = config.log.error(context, e);
-                return apiResponseController.sendError(e, 500, res);
+                return apiResponseController.sendError(msg, 500, res);
             });
         if (msg) return;
 
