@@ -1,0 +1,9 @@
+{
+  "filters": {
+    "op": "contains",
+    "content": {
+      "field": "assay",
+      "value": "cancer"
+    }
+  }
+}
