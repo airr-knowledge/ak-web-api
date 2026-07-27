@@ -51,7 +51,7 @@ QueryController.performQuery = async function (req, res) {
     let filters = req.body['filters'];
 
     // transform the query input into a postgres query
-    let results = [];
+    let results = null;
     try {
         var msg = null;
         var error = { message: '' };
@@ -80,7 +80,11 @@ QueryController.performQuery = async function (req, res) {
     }
 
     //console.log(results);
+    let data = {};
+    data['Info'] = JSON.parse(JSON.stringify(config.info));
+    data['Info']['partial_results'] = results['partial'];
+    data['TCRpMHC'] = results['results'];
 
     // Return the results
-    return res.status(200).json(results);
+    return res.status(200).json(data);
 }
