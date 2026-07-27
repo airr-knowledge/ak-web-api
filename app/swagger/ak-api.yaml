@@ -25,7 +25,7 @@
 openapi: '3.0.0'
 info:
   title: AIRR Knowledge API
-  version: '1.0.0'
+  version: '1.1.0'
   contact:
     name: AIRR Knowledge
     url: 'https://airr-knowledge.org/'
@@ -85,12 +85,47 @@ components:
           description: Detail about the error
 
     # POST query request
-    query_object:
+    query_request:
       description: Query filter and associated parameters for POST end points
       type: object
       properties:
         filters:
           type: object
+
+    AK_QueryExperiment:
+      type: object
+
+    AK_TCRpMHC:
+      type: object
+
+    AK_AntibodyAntigen:
+      type: object
+
+    # query response
+    query_response:
+      description: Results from query
+      type: object
+      properties:
+        Info:
+          $ref: '#/components/schemas/info_object'
+        Experiment:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/AK_QueryExperiment'
+          description: "keys are AKC_ID or AK CURIE"
+        TCRpMHC:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/AK_TCRpMHC'
+          description: "keys are AKC_ID or AK CURIE"
+        AntibodyAntigen:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/AK_AntibodyAntigen'
+          description: "keys are AKC_ID or AK CURIE"
+# cannot use linkml output directly
+#            $ref: 'https://raw.githubusercontent.com/airr-knowledge/ak-schema/refs/tags/v0.6.0/project/jsonschema/ak_schema.schema.json#/$defs/QueryExperiment'
+
 
 paths:
   /:
@@ -145,7 +180,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/query_object'
+              $ref: '#/components/schemas/query_request'
       responses:
         '200':
           description: Success.
