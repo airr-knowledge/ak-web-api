@@ -25,7 +25,7 @@
 openapi: '3.0.0'
 info:
   title: AIRR Knowledge API
-  version: '1.1.0'
+  version: '1.2.0'
   contact:
     name: AIRR Knowledge
     url: 'https://airr-knowledge.org/'
@@ -126,6 +126,17 @@ components:
 # cannot use linkml output directly
 #            $ref: 'https://raw.githubusercontent.com/airr-knowledge/ak-schema/refs/tags/v0.6.0/project/jsonschema/ak_schema.schema.json#/$defs/QueryExperiment'
 
+    # query download response
+    download_response:
+      description: Results from query download request
+      type: object
+      properties:
+        status:
+          type: string
+        message:
+          type: string
+        download_url:
+          type: string
 
 paths:
   /:
@@ -194,4 +205,26 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/error_response'
-  
+
+  /query/download:
+    post:
+      description: Query submission for download
+      operationId: perform_query_download
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/query_request'
+      responses:
+        '200':
+          description: Success.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/download_response'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
