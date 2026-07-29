@@ -3,7 +3,7 @@
     "op": "=",
     "content": {
       "field": "assay.participant.species.term_id",
-      "value": "NCBITAXON:10090"
+      "value": "NCBITAXON:9606"
     }
   }
 }
