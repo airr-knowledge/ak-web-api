@@ -43,7 +43,7 @@ var pgIO = require('vdj-tapis-js/pgIO');
 
 var apiResponseController = require('./apiResponseController');
 
-// service status
+// perform AK query and return results
 QueryController.performQuery = async function (req, res) {
     var context = 'QueryController.performQuery';
 
@@ -57,8 +57,9 @@ QueryController.performQuery = async function (req, res) {
         var error = { message: '' };
         results = await pgIO.performQueryOperation(filters, error)
             .catch(function(e) {
-                msg = config.log.error(context, e);
-                return apiResponseController.sendError(msg, 500, res);
+                msg = config.log.error(context, e.message);
+                if (e && e['status'] == 'timeout') return apiResponseController.sendError(e, 400, res);
+                else return apiResponseController.sendError(msg, 500, res);
             });
         if (msg) return;
 
@@ -84,6 +85,53 @@ QueryController.performQuery = async function (req, res) {
     data['Info'] = JSON.parse(JSON.stringify(config.info));
     data['Info']['partial_results'] = results['partial'];
     data['TCRpMHC'] = results['results'];
+
+    // Return the results
+    return res.status(200).json(data);
+}
+
+// perform AK query, save results to file and return download url
+QueryController.performQueryDownload = async function (req, res) {
+    var context = 'QueryController.performQuery';
+
+    console.log(req.body);
+    let filters = req.body['filters'];
+
+    // transform the query input into a postgres query
+    let results = null;
+    try {
+        var msg = null;
+        var error = { message: '' };
+        // do a count query to see how big
+        results = await pgIO.performQueryOperation(filters, error, true)
+            .catch(function(e) {
+                msg = config.log.error(context, e);
+                return apiResponseController.sendError(msg, 500, res);
+            });
+        if (msg) return;
+
+        if (!results) {
+            let result_message = "Could not construct valid query. Error: " + error['message'];
+            config.log.error(context, result_message);
+            // queryRecord['status'] = 'reject';
+            // queryRecord['message'] = result_message;
+            // tapisIO.recordQuery(queryRecord);
+            return apiResponseController.sendError(result_message, 400, res);
+        }
+    } catch (e) {
+        let result_message = "Could not construct valid query: " + e;
+        config.log.error(context, result_message);
+        // queryRecord['status'] = 'reject';
+        // queryRecord['message'] = result_message;
+        // tapisIO.recordQuery(queryRecord);
+        return apiResponseController.sendError(result_message, 400, res);
+    }
+
+    console.log(results);
+    let data = {};
+    data['Info'] = JSON.parse(JSON.stringify(config.info));
+    //data['Info']['partial_results'] = results['partial'];
+    //data['TCRpMHC'] = results['results'];
 
     // Return the results
     return res.status(200).json(data);

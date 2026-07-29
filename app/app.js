@@ -178,6 +178,7 @@ ServiceAccount.getToken()
                 get_service_status: async function(req, res) { return try_function(req, res, apiResponseController.getStatus); },
                 get_service_info: async function(req, res) { return try_function(req, res, apiResponseController.getInfo); },
                 perform_query: async function(req, res) { return try_function(req, res, queryController.performQuery); },
+                perform_query_download: async function(req, res) { return try_function(req, res, queryController.performQueryDownload); },
 
             }
         });
