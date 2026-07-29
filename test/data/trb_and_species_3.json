@@ -1,0 +1,28 @@
+{
+  "filters": {
+    "op": "and",
+    "content": [
+      {
+        "op": "=",
+        "content": {
+          "field": "tcr.receptor.trb_chain.junction_aa",
+          "value": "CASSLAGLAGTDTQYF"
+        }
+      },
+      {
+        "op": "=",
+        "content": {
+          "field": "tcr.receptor.trb_chain.species",
+          "value": "NCBITAXON:9606"
+        }
+      },
+      {
+        "op": "=",
+        "content": {
+          "field": "tcr.receptor.ab_paired",
+          "value": true
+        }
+      }
+    ]
+  }
+}
