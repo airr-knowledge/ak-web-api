@@ -28,6 +28,8 @@
 var QueryController = {};
 module.exports = QueryController;
 
+const { v4: uuidv4 } = require('uuid');
+
 // Server config
 var config = require('../config/config');
 
@@ -42,6 +44,7 @@ var webhookIO = require('vdj-tapis-js/webhookIO');
 var pgIO = require('vdj-tapis-js/pgIO');
 
 var apiResponseController = require('./apiResponseController');
+const pgSettings = require('../../vdj-tapis-js/pgSettings');
 
 // perform AK query and return results
 QueryController.performQuery = async function (req, res) {
@@ -92,21 +95,22 @@ QueryController.performQuery = async function (req, res) {
 
 // perform AK query, save results to file and return download url
 QueryController.performQueryDownload = async function (req, res) {
-    var context = 'QueryController.performQuery';
+    var context = 'QueryController.performQueryDownload';
+    var msg = null;
 
     console.log(req.body);
     let filters = req.body['filters'];
 
-    // transform the query input into a postgres query
+    // first perform a count query to see how big the data will be
     let results = null;
     try {
-        var msg = null;
         var error = { message: '' };
         // do a count query to see how big
         results = await pgIO.performQueryOperation(filters, error, true)
             .catch(function(e) {
                 msg = config.log.error(context, e);
-                return apiResponseController.sendError(msg, 500, res);
+                if (e && e['status'] == 'timeout') return apiResponseController.sendError(e, 408, res);
+                else return apiResponseController.sendError(msg, 500, res);
             });
         if (msg) return;
 
@@ -127,11 +131,31 @@ QueryController.performQueryDownload = async function (req, res) {
         return apiResponseController.sendError(result_message, 400, res);
     }
 
-    console.log(results);
+    // too big?
+    if (results['count'] > pgSettings.max_download_results) {
+        let result_message = { status: "max_exceeded", message: "Query results exceeds maximum allowable download (" + results['count'] + " > " + pgSettings.max_download_results };
+        return apiResponseController.sendError(result_message, 400, res);
+    }
+
+    // perform query to file
+    // TODO: paths should be parameterized
+    var uuid = uuidv4();
+    let filename = 'akc-query-' + uuid + '.tsv';
+    let outpath = '/airrkb_download/' + filename;
+    let download_url = 'https://api.airr-knowledge.org/akc/download/' + filename;
+    let format = 'tsv'
+    var result = await pgIO.performQueryToFile(filters, outpath, format)
+        .catch(function(error) {
+            msg = 'pgIO.performQueryToFile, error: ' + error;
+        });
+    if (msg) {
+        msg = config.log.error(context, msg);
+        return apiResponseController.sendError(msg, 500, res);
+    }
+
     let data = {};
-    data['Info'] = JSON.parse(JSON.stringify(config.info));
-    //data['Info']['partial_results'] = results['partial'];
-    //data['TCRpMHC'] = results['results'];
+    data['status'] = 'success';
+    data['download_url'] = download_url;
 
     // Return the results
     return res.status(200).json(data);
