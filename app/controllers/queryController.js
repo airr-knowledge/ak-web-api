@@ -109,7 +109,7 @@ QueryController.performQueryDownload = async function (req, res) {
         results = await pgIO.performQueryOperation(filters, error, true)
             .catch(function(e) {
                 msg = config.log.error(context, e);
-                if (e && e['status'] == 'timeout') return apiResponseController.sendError(e, 408, res);
+                if (e && e['status'] == 'timeout') return apiResponseController.sendTimeout(e.message, 408, res, pgSettings.download_timeout / 1000);
                 else return apiResponseController.sendError(msg, 500, res);
             });
         if (msg) return;
@@ -133,8 +133,8 @@ QueryController.performQueryDownload = async function (req, res) {
 
     // too big?
     if (results['count'] > pgSettings.max_download_results) {
-        let result_message = { status: "max_exceeded", message: "Query results exceeds maximum allowable download (" + results['count'] + " > " + pgSettings.max_download_results };
-        return apiResponseController.sendError(result_message, 400, res);
+        let result_message = { status: "max_exceeded", message: "Query results exceeds maximum allowable download (" + results['count'] + " > " + pgSettings.max_download_results +")" };
+        return apiResponseController.sendTooLarge(result_message.message, 413, res, results['count'], pgSettings.max_download_results);
     }
 
     // perform query to file
