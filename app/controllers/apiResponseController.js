@@ -79,3 +79,30 @@ ApiResponseController.sendError = function(errorMessage, errorCode, response) {
         response.status(errorCode).json(apiResponse);
     }
 };
+
+// Sends an error response with a message to the client
+ApiResponseController.sendTimeout = function(errorMessage, errorCode, response, max_time) {
+
+    let apiResponse = {};
+    apiResponse['status'] = 'timeout';
+    apiResponse['max_time'] = max_time;
+    apiResponse['message'] = errorMessage;
+
+    if (response) {
+        response.status(errorCode).json(apiResponse);
+    }
+};
+
+// Sends an error response with a message to the client
+ApiResponseController.sendTooLarge = function(errorMessage, errorCode, response, count, max_count) {
+
+    let apiResponse = {};
+    apiResponse['status'] = 'timeout';
+    apiResponse['count'] = count;
+    apiResponse['max_count'] = max_count;
+    apiResponse['message'] = errorMessage;
+
+    if (response) {
+        response.status(errorCode).json(apiResponse);
+    }
+};
