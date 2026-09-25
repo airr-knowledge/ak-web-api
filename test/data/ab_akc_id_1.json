@@ -1,0 +1,13 @@
+{
+  "complex": {
+    "receptor_type": "alpha-beta",
+    "paired_chain_only": false,
+    "filters": {
+      "op": "=",
+      "content": {
+        "field": "complex.akc_id",
+        "value": "AKC_COMPLEX:31153a6c6e708ecb4c7e8d2eb21bd054c142d0b1444fbd25e73102639383dbbd"
+      }
+    }
+  }
+}

@@ -1,9 +1,0 @@
-{
-  "filters": {
-    "op": "=",
-    "content": {
-      "field": "tcr.receptor.trg_chain.v_call",
-      "value": "TRGV10*01"
-    }
-  }
-}

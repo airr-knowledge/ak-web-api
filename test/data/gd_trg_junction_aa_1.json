@@ -1,0 +1,13 @@
+{
+  "complex": {
+    "receptor_type": "gamma-delta",
+    "paired_chain_only": false,
+    "filters": {
+      "op": "=",
+      "content": {
+        "field": "trg_chain.junction_aa",
+        "value": "CAACREMRWAYCNHKATYF"
+      }
+    }
+  }
+}

@@ -1,9 +1,0 @@
-{
-  "filters": {
-    "op": "=",
-    "content": {
-      "field": "tcr.receptor.ab_paired",
-      "value": true
-    }
-  }
-}
