@@ -1,0 +1,13 @@
+{
+  "complex": {
+    "receptor_type": "alpha-beta",
+    "paired_chain_only": false,
+    "filters": {
+      "op": "=",
+      "content": {
+        "field": "mhc",
+        "value": "MRO:0001290"
+      }
+    }
+  }
+}

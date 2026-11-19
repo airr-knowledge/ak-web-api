@@ -1,9 +1,0 @@
-{
-  "filters": {
-    "op": "=",
-    "content": {
-      "field": "tcr.receptor.tra_chain.v_call",
-      "value": "TRAV35*01"
-    }
-  }
-}

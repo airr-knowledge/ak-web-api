@@ -1,0 +1,15 @@
+{
+  "complex": {
+    "receptor_type": "alpha-beta",
+    "paired_chain_only": false
+  },
+  "assay": {
+    "filters": {
+      "op": "in",
+      "content": {
+        "field": "assay.participant.genotype_set.genotype_class_list.documented_alleles.label",
+        "value": ["TRBV11-1*01", "TRBV11-2*01"]
+      }
+    }
+  }
+}

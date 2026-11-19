@@ -1,0 +1,6 @@
+{
+  "complex": {
+    "receptor_type": "heavy-lambda",
+    "paired_chain_only": true
+  }
+}

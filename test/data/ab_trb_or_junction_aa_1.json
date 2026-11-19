@@ -1,0 +1,25 @@
+{
+  "complex": {
+    "receptor_type": "alpha-beta",
+    "paired_chain_only": false,
+    "filters": {
+      "op": "or",
+      "content": [
+        {
+          "op": "=",
+          "content": {
+            "field": "trb_chain.junction_aa",
+            "value": "CASSSGLELFF"
+          }
+        },
+        {
+          "op": "=",
+          "content": {
+            "field": "trb_chain.junction_aa",
+            "value": "CASSPSRDRGYEQFF"
+          }
+        }
+      ]
+    }
+  }
+}

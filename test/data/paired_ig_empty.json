@@ -1,0 +1,6 @@
+{
+  "complex": {
+    "receptor_type": "heavy-light",
+    "paired_chain_only": true
+  }
+}

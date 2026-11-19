@@ -1,0 +1,15 @@
+{
+  "complex": {
+    "receptor_type": "heavy-kappa",
+    "paired_chain_only": false
+  },
+  "assay": {
+    "filters": {
+      "op": "in",
+      "content": {
+        "field": "assay.investigation.documents",
+        "value": ["https://doi.org/10.1038/s41467-019-08489-3"]
+      }
+    }
+  }
+}

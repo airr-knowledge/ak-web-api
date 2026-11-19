@@ -1,9 +1,0 @@
-{
-  "filters": {
-    "op": "=",
-    "content": {
-      "field": "tcr.receptor.trg_chain.junction_aa",
-      "value": "CAACREMRWAYCNHKATYF"
-    }
-  }
-}

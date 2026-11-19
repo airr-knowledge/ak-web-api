@@ -1,0 +1,6 @@
+{
+  "complex": {
+    "receptor_type": "heavy-kappa",
+    "paired_chain_only": true
+  }
+}

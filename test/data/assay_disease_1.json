@@ -1,0 +1,15 @@
+{
+  "complex": {
+    "receptor_type": "alpha-beta",
+    "paired_chain_only": false
+  },
+  "assay": {
+    "filters": {
+      "op": "=",
+      "content": {
+        "field": "assay.life_events.disease.term_id",
+        "value": "DOID:0080600"
+      }
+    }
+  }
+}

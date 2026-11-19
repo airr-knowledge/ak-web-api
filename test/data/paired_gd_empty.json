@@ -1,0 +1,6 @@
+{
+  "complex": {
+    "receptor_type": "gamma-delta",
+    "paired_chain_only": true
+  }
+}

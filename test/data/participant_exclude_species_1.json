@@ -1,9 +1,0 @@
-{
-  "filters": {
-    "op": "exclude",
-    "content": {
-      "field": "assay.participant.species",
-      "value": ["NCBITAXON:9606"]
-    }
-  }
-}
