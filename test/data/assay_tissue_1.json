@@ -1,9 +1,22 @@
 {
-  "filters": {
-    "op": "=",
-    "content": {
-      "field": "assay.specimen.tissue",
-      "value": "UBERON:0001043"
+  "complex": {
+    "receptor_type": "alpha-beta",
+    "paired_chain_only": false,
+    "filters": {
+      "op": "=",
+      "content": {
+        "field": "trb_chain.junction_aa",
+        "value": "CASSLFQGPSYGYTF"
+      }
+    }
+  },
+  "assay": {
+    "filters": {
+      "op": "=",
+      "content": {
+        "field": "assay.specimen.tissue.term_id",
+        "value": "UBERON:0001043"
+      }
     }
   }
 }

@@ -1,0 +1,15 @@
+{
+  "complex": {
+    "receptor_type": "heavy-kappa",
+    "paired_chain_only": false
+  },
+  "assay": {
+    "filters": {
+      "op": "=",
+      "content": {
+        "field": "assay.participant.genotype_set.genotype_class_list.documented_alleles.label",
+        "value": "IGHV1-2*02"
+      }
+    }
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "complex": {
+    "receptor_type": "alpha-beta",
+    "paired_chain_only": false,
+    "filters": {
+      "op": "is not null",
+      "content": {
+        "field": "epitope"
+      }
+    }
+  },
+  "assay": {
+    "filters": {
+      "op": "in",
+      "content": {
+        "field": "assay.investigation.documents",
+        "value": ["PMID:12469116"]
+      }
+    }
+  }
+}

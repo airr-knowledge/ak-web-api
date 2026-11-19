@@ -1,0 +1,15 @@
+{
+  "complex": {
+    "receptor_type": "alpha-beta",
+    "paired_chain_only": false
+  },
+  "assay": {
+    "filters": {
+      "op": "contains",
+      "content": {
+        "field": "assay.investigation",
+        "value": "cancer"
+      }
+    }
+  }
+}
