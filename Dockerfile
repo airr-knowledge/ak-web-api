@@ -55,6 +55,6 @@ COPY . /ak-web-api
 RUN cd /ak-web-api && npm install
 
 # ESLint
-RUN cd /ak-web-api && npm run eslint app
+RUN cd /ak-web-api && npm run eslint app vdj-tapis-js
 
 CMD ["/root/start_supervisor.sh"]
