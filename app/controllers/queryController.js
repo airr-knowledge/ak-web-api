@@ -41,7 +41,7 @@ var GuestAccount = tapisIO.guestAccount;
 var authController = tapisIO.authController;
 var webhookIO = require('vdj-tapis-js/webhookIO');
 
-var pgIO = require('vdj-tapis-js/pgIO');
+var pgIO = require('vdj-tapis-js/airrkb_pgIO');
 
 var apiResponseController = require('./apiResponseController');
 const pgSettings = require('../../vdj-tapis-js/pgSettings');
@@ -51,46 +51,82 @@ QueryController.performQuery = async function (req, res) {
     var context = 'QueryController.performQuery';
 
     console.log(req.body);
-    let filters = req.body['filters'];
+    let complex_filter = req.body['complex'];
+    let assay_filter = req.body['assay'];
+
+    var queryRecord = {
+        endpoint: 'query',
+        method: 'POST',
+        query: req.body,
+        ip: req.ip,
+        status: 'unknown',
+        message: null,
+        record_count: null,
+        start_time: Date.now(),
+        elapsed_time: null
+    };
 
     // transform the query input into a postgres query
     let results = null;
     try {
         var msg = null;
         var error = { message: '' };
-        results = await pgIO.performQueryOperation(filters, error)
-            .catch(function(e) {
+        results = await pgIO.performQueryOperation(complex_filter, assay_filter, error)
+            .catch(async function(e) {
                 msg = config.log.error(context, e.message);
-                if (e && e['status'] == 'timeout') return apiResponseController.sendError(e, 400, res);
-                else return apiResponseController.sendError(msg, 500, res);
+                if (e && e['status'] == 'timeout') {
+                    queryRecord['status'] = 'timeout';
+                    queryRecord['message'] = msg;
+                    queryRecord['elapsed_time'] = (Date.now() - queryRecord['start_time']) / 1000;
+                    await pgIO.recordQuery(queryRecord);
+                    return apiResponseController.sendError(e, 400, res);
+                } else {
+                    queryRecord['status'] = 'error';
+                    queryRecord['message'] = msg;
+                    queryRecord['elapsed_time'] = (Date.now() - queryRecord['start_time']) / 1000;
+                    await pgIO.recordQuery(queryRecord);
+                    return apiResponseController.sendError(msg, 500, res);
+                }
             });
         if (msg) return;
 
         if (!results) {
             let result_message = "Could not construct valid query. Error: " + error['message'];
-            config.log.error(context, result_message);
-            // queryRecord['status'] = 'reject';
-            // queryRecord['message'] = result_message;
-            // tapisIO.recordQuery(queryRecord);
+            msg = config.log.error(context, result_message);
+            queryRecord['status'] = 'reject';
+            queryRecord['message'] = msg;
+            queryRecord['elapsed_time'] = (Date.now() - queryRecord['start_time']) / 1000;
+            await pgIO.recordQuery(queryRecord);
             return apiResponseController.sendError(result_message, 400, res);
         }
     } catch (e) {
         let result_message = "Could not construct valid query: " + e;
-        config.log.error(context, result_message);
-        // queryRecord['status'] = 'reject';
-        // queryRecord['message'] = result_message;
-        // tapisIO.recordQuery(queryRecord);
+        msg = config.log.error(context, result_message);
+        queryRecord['status'] = 'reject';
+        queryRecord['message'] = msg;
+        queryRecord['elapsed_time'] = (Date.now() - queryRecord['start_time']) / 1000;
+        await pgIO.recordQuery(queryRecord);
         return apiResponseController.sendError(result_message, 400, res);
     }
+
 
     //console.log(results);
     let data = {};
     data['Info'] = JSON.parse(JSON.stringify(config.info));
     data['Info']['partial_results'] = results['partial'];
-    data['TCRpMHC'] = results['results'];
+    data['TCRpMHC'] = results['TCRpMHC'];
+    data['AntibodyAntigen'] = results['AntibodyAntigen'];
+    data['Assay'] = results['Assay'];
 
-    // Return the results
-    return res.status(200).json(data);
+    queryRecord['status'] = 'success';
+    queryRecord['record_count'] = 0;
+    if (data['TCRpMHC']) queryRecord['record_count'] += data['TCRpMHC'].length;
+    if (data['AntibodyAntigen']) queryRecord['record_count'] += data['AntibodyAntigen'].length;
+    if (data['Assay']) queryRecord['record_count'] += Object.keys(data['Assay']).length;
+    queryRecord['elapsed_time'] = (Date.now() - queryRecord['start_time']) / 1000;
+    await pgIO.recordQuery(queryRecord);
+
+    res.status(200).json(data);
 }
 
 // perform AK query, save results to file and return download url
@@ -99,14 +135,15 @@ QueryController.performQueryDownload = async function (req, res) {
     var msg = null;
 
     console.log(req.body);
-    let filters = req.body['filters'];
+    let complex_filter = req.body['complex'];
+    let assay_filter = req.body['assay'];
 
     // first perform a count query to see how big the data will be
     let results = null;
     try {
         var error = { message: '' };
         // do a count query to see how big
-        results = await pgIO.performQueryOperation(filters, error, true)
+        results = await pgIO.performQueryOperation(complex_filter, assay_filter, error, true)
             .catch(function(e) {
                 msg = config.log.error(context, e);
                 if (e && e['status'] == 'timeout') return apiResponseController.sendTimeout(e.message, 408, res, pgSettings.download_timeout / 1000);
@@ -144,7 +181,7 @@ QueryController.performQueryDownload = async function (req, res) {
     let outpath = '/airrkb_download/' + filename;
     let download_url = 'https://api.airr-knowledge.org/akc/download/' + filename;
     let format = 'tsv'
-    var result = await pgIO.performQueryToFile(filters, outpath, format)
+    var result = await pgIO.performQueryToFile(complex_filter, assay_filter, outpath, format)
         .catch(function(error) {
             msg = 'pgIO.performQueryToFile, error: ' + error;
         });
@@ -159,4 +196,174 @@ QueryController.performQueryDownload = async function (req, res) {
 
     // Return the results
     return res.status(200).json(data);
+}
+
+QueryController.ontologyTissueList = async function (req, res) {
+    var context = 'QueryController.ontologyTissueList';
+    var msg = null;
+
+    // transform the query input into a postgres query
+    let results = null;
+    try {
+        var msg = null;
+        var error = { message: '' };
+        results = await pgIO.ontologyTissueList(error)
+            .catch(function(e) {
+                msg = config.log.error(context, e.message);
+                if (e && e['status'] == 'timeout') return apiResponseController.sendError(e, 400, res);
+                else return apiResponseController.sendError(msg, 500, res);
+            });
+        if (msg) return;
+
+        if (!results) {
+            let result_message = "Could not retrieve ontology list. Error: " + error['message'];
+            config.log.error(context, result_message);
+            return apiResponseController.sendError(result_message, 400, res);
+        }
+    } catch (e) {
+        let result_message = "Could not retrieve ontology list: " + e;
+        config.log.error(context, result_message);
+        return apiResponseController.sendError(result_message, 400, res);
+    }
+
+    let data = {};
+    data['Info'] = JSON.parse(JSON.stringify(config.info));
+    data['Term'] = results;
+    res.status(200).json(data);
+}
+
+QueryController.ontologyDiseaseList = async function (req, res) {
+    var context = 'QueryController.ontologyDiseaseList';
+    var msg = null;
+
+    // transform the query input into a postgres query
+    let results = null;
+    try {
+        var msg = null;
+        var error = { message: '' };
+        results = await pgIO.ontologyDiseaseList(error)
+            .catch(function(e) {
+                msg = config.log.error(context, e.message);
+                if (e && e['status'] == 'timeout') return apiResponseController.sendError(e, 400, res);
+                else return apiResponseController.sendError(msg, 500, res);
+            });
+        if (msg) return;
+
+        if (!results) {
+            let result_message = "Could not retrieve ontology list. Error: " + error['message'];
+            config.log.error(context, result_message);
+            return apiResponseController.sendError(result_message, 400, res);
+        }
+    } catch (e) {
+        let result_message = "Could not retrieve ontology list: " + e;
+        config.log.error(context, result_message);
+        return apiResponseController.sendError(result_message, 400, res);
+    }
+
+    let data = {};
+    data['Info'] = JSON.parse(JSON.stringify(config.info));
+    data['Term'] = results;
+    res.status(200).json(data);
+}
+
+QueryController.ontologyMHCList = async function (req, res) {
+    var context = 'QueryController.ontologyMHCList';
+    var msg = null;
+
+    // transform the query input into a postgres query
+    let results = null;
+    try {
+        var msg = null;
+        var error = { message: '' };
+        results = await pgIO.ontologyMHCList(error)
+            .catch(function(e) {
+                msg = config.log.error(context, e.message);
+                if (e && e['status'] == 'timeout') return apiResponseController.sendError(e, 400, res);
+                else return apiResponseController.sendError(msg, 500, res);
+            });
+        if (msg) return;
+
+        if (!results) {
+            let result_message = "Could not retrieve ontology list. Error: " + error['message'];
+            config.log.error(context, result_message);
+            return apiResponseController.sendError(result_message, 400, res);
+        }
+    } catch (e) {
+        let result_message = "Could not retrieve ontology list: " + e;
+        config.log.error(context, result_message);
+        return apiResponseController.sendError(result_message, 400, res);
+    }
+
+    let data = {};
+    data['Info'] = JSON.parse(JSON.stringify(config.info));
+    data['Term'] = results;
+    res.status(200).json(data);
+}
+
+QueryController.ontologyAntigenOrganismList = async function (req, res) {
+    var context = 'QueryController.ontologyAntigenOrganismList';
+    var msg = null;
+
+    // transform the query input into a postgres query
+    let results = null;
+    try {
+        var msg = null;
+        var error = { message: '' };
+        results = await pgIO.ontologyAntigenOrganismList(error)
+            .catch(function(e) {
+                msg = config.log.error(context, e.message);
+                if (e && e['status'] == 'timeout') return apiResponseController.sendError(e, 400, res);
+                else return apiResponseController.sendError(msg, 500, res);
+            });
+        if (msg) return;
+
+        if (!results) {
+            let result_message = "Could not retrieve ontology list. Error: " + error['message'];
+            config.log.error(context, result_message);
+            return apiResponseController.sendError(result_message, 400, res);
+        }
+    } catch (e) {
+        let result_message = "Could not retrieve ontology list: " + e;
+        config.log.error(context, result_message);
+        return apiResponseController.sendError(result_message, 400, res);
+    }
+
+    let data = {};
+    data['Info'] = JSON.parse(JSON.stringify(config.info));
+    data['Term'] = results;
+    res.status(200).json(data);
+}
+
+QueryController.ontologyAssayList = async function (req, res) {
+    var context = 'QueryController.ontologyAssayList';
+    var msg = null;
+
+    // transform the query input into a postgres query
+    let results = null;
+    try {
+        var msg = null;
+        var error = { message: '' };
+        results = await pgIO.ontologyAssayList(error)
+            .catch(function(e) {
+                msg = config.log.error(context, e.message);
+                if (e && e['status'] == 'timeout') return apiResponseController.sendError(e, 400, res);
+                else return apiResponseController.sendError(msg, 500, res);
+            });
+        if (msg) return;
+
+        if (!results) {
+            let result_message = "Could not retrieve ontology list. Error: " + error['message'];
+            config.log.error(context, result_message);
+            return apiResponseController.sendError(result_message, 400, res);
+        }
+    } catch (e) {
+        let result_message = "Could not retrieve ontology list: " + e;
+        config.log.error(context, result_message);
+        return apiResponseController.sendError(result_message, 400, res);
+    }
+
+    let data = {};
+    data['Info'] = JSON.parse(JSON.stringify(config.info));
+    data['Term'] = results;
+    res.status(200).json(data);
 }

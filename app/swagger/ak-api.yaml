@@ -25,7 +25,7 @@
 openapi: '3.0.0'
 info:
   title: AIRR Knowledge API
-  version: '1.2.0'
+  version: '2.0.0'
   contact:
     name: AIRR Knowledge
     url: 'https://airr-knowledge.org/'
@@ -33,16 +33,16 @@ info:
   description: API service for AIRR Knowledge.
 
 servers:
-  - url: https://api.airr-knowledge.org/akc/v1
+  - url: https://api.airr-knowledge.org/akc/v2
     description: Production server
     variables:
       basePath:
-        default: /akc/v1
-  - url: https://staging.airr-knowledge.org/akc/v1
+        default: /akc/v2
+  - url: https://staging.airr-knowledge.org/akc/v2
     description: Staging server
     variables:
       basePath:
-        default: /akc/v1
+        default: /akc/v2
 
 # TODO: this needs to point to the LinkML schema for the API
 components:
@@ -89,8 +89,29 @@ components:
       description: Query filter and associated parameters for POST end points
       type: object
       properties:
-        filters:
+        complex:
           type: object
+          required:
+            - receptor_type
+          properties:
+            receptor_type:
+              type: string
+              enum:
+                - alpha-beta
+                - gamma-delta
+                - heavy-kappa
+                - heavy-lambda
+            paired_chain_only:
+              type: boolean
+              default: false
+            filters:
+              type: object
+        assay:
+          type: object
+          properties:
+            filters:
+              type: object
+
 
     AK_QueryExperiment:
       type: object
@@ -222,6 +243,96 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/download_response'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+
+  /ontology/tissue:
+    get:
+      description: Returns ontology list for tissue
+      operationId: ontology_tissue_list
+      responses:
+        '200':
+          description: Success.
+          content:
+            application/json:
+              schema:
+                type: object
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+
+  /ontology/disease:
+    get:
+      description: Returns ontology list for disease
+      operationId: ontology_disease_list
+      responses:
+        '200':
+          description: Success.
+          content:
+            application/json:
+              schema:
+                type: object
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+
+  /ontology/mhc:
+    get:
+      description: Returns ontology list for MHC
+      operationId: ontology_mhc_list
+      responses:
+        '200':
+          description: Success.
+          content:
+            application/json:
+              schema:
+                type: object
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+
+  /ontology/antigen_organism:
+    get:
+      description: Returns ontology list for antigen organisms
+      operationId: ontology_antigen_organism_list
+      responses:
+        '200':
+          description: Success.
+          content:
+            application/json:
+              schema:
+                type: object
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error_response'
+
+  /ontology/assay_type:
+    get:
+      description: Returns ontology list for assay types
+      operationId: ontology_assay_type_list
+      responses:
+        '200':
+          description: Success.
+          content:
+            application/json:
+              schema:
+                type: object
         '500':
           description: Server error
           content:

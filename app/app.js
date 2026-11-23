@@ -85,7 +85,7 @@ var authController = tapisIO.authController;
 var webhookIO = require('vdj-tapis-js/webhookIO');
 var pgSettings = require('vdj-tapis-js/pgSettings');
 pgSettings.set_config(config);
-var pgIO = require('vdj-tapis-js/pgIO');
+var pgIO = require('vdj-tapis-js/airrkb_pgIO');
 
 
 // Controllers
@@ -180,6 +180,11 @@ ServiceAccount.getToken()
                 perform_query: async function(req, res) { return try_function(req, res, queryController.performQuery); },
                 perform_query_download: async function(req, res) { return try_function(req, res, queryController.performQueryDownload); },
 
+                ontology_tissue_list: async function(req, res) { return try_function(req, res, queryController.ontologyTissueList); },
+                ontology_disease_list: async function(req, res) { return try_function(req, res, queryController.ontologyDiseaseList); },
+                ontology_mhc_list: async function(req, res) { return try_function(req, res, queryController.ontologyMHCList); },
+                ontology_antigen_organism_list: async function(req, res) { return try_function(req, res, queryController.ontologyAntigenOrganismList); },
+                ontology_assay_type_list: async function(req, res) { return try_function(req, res, queryController.ontologyAssayList); },
             }
         });
 

@@ -39,7 +39,7 @@ var GuestAccount = tapisIO.guestAccount;
 var authController = tapisIO.authController;
 var webhookIO = require('vdj-tapis-js/webhookIO');
 
-var pgIO = require('vdj-tapis-js/pgIO');
+var pgIO = require('vdj-tapis-js/airrkb_pgIO');
 
 // service status
 ApiResponseController.getStatus = function(req, res) {
