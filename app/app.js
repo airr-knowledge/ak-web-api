@@ -50,6 +50,8 @@ var context = 'app';
 var config = require('./config/config');
 app.set('port', config.port);
 app.set('sslOptions', config.sslOptions);
+// trust proxy so we can get client IP
+app.set('trust proxy', true);
 
 // CORS
 var allowCrossDomain = function(request, response, next) {
